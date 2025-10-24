@@ -22,6 +22,19 @@ function escapeAppleScriptString(str: string): string {
   return str.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
 }
 
+/**
+ * Escapes a path for safe use when typed into a shell via keystroke
+ * The path will be wrapped in double quotes and special chars escaped
+ */
+function escapePathForShell(path: string): string {
+  // Escape special shell characters that could break out of quotes or execute commands
+  return path
+    .replace(/\\/g, "\\\\")  // Backslash
+    .replace(/"/g, '\\"')    // Double quote
+    .replace(/\$/g, "\\$")   // Dollar sign
+    .replace(/`/g, "\\`");   // Backtick
+}
+
 export default function OpenProject() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -85,31 +98,41 @@ export default function OpenProject() {
       switch (project.terminal) {
         case "ghostty": {
           // Ghostty: ouvre l'app, active-la puis envoie les commandes
-          // Build the command to be typed safely
-          const cdCommand = `cd ${escapeShellArg(project.path)} && ${escapeShellArg(ccCommand)}`;
-          const escapedForAppleScript = escapeAppleScriptString(cdCommand);
+          // For keystroke, we build a shell command that will be typed literally
+          // The path goes in double quotes with escaping, command stays unquoted
+          const shellSafePath = escapePathForShell(project.path);
+          const shellSafeCommand = ccCommand.replace(/[;&|`$]/g, ""); // Remove dangerous shell chars from command
+          const cdCommand = `cd "${shellSafePath}" && ${shellSafeCommand}`;
+          // Now escape for AppleScript (double the backslashes, escape quotes)
+          const escapedForAppleScript = cdCommand.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
           command = `open -na Ghostty && sleep 0.5 && osascript -e 'tell application "Ghostty" to activate' -e 'delay 0.3' -e 'tell application "System Events" to keystroke "${escapedForAppleScript}"' -e 'tell application "System Events" to keystroke return'`;
           break;
         }
         case "iterm": {
-          // For iTerm, we use AppleScript's "write text" which handles escaping
-          // But we still need to escape the path and command for the AppleScript string
-          const escapedPath = escapeAppleScriptString(project.path);
-          const escapedCommand = escapeAppleScriptString(ccCommand);
+          // For iTerm, we use AppleScript's "write text" which passes to shell
+          // Build safe shell command first, then escape for AppleScript
+          const shellSafePath = escapePathForShell(project.path);
+          const shellSafeCommand = ccCommand.replace(/[;&|`$]/g, "");
+          const shellCommand = `cd "${shellSafePath}" && ${shellSafeCommand}`;
+          // Escape for AppleScript string
+          const escapedForAppleScript = shellCommand.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
           command = `osascript -e 'tell application "iTerm"
             create window with default profile
             tell current session of current window
-              write text "cd \\"${escapedPath}\\" && ${escapedCommand}"
+              write text "${escapedForAppleScript}"
             end tell
           end tell'`;
           break;
         }
         case "terminal": {
           // For Terminal, we use AppleScript's "do script"
-          const escapedPath = escapeAppleScriptString(project.path);
-          const escapedCommand = escapeAppleScriptString(ccCommand);
+          const shellSafePath = escapePathForShell(project.path);
+          const shellSafeCommand = ccCommand.replace(/[;&|`$]/g, "");
+          const shellCommand = `cd "${shellSafePath}" && ${shellSafeCommand}`;
+          // Escape for AppleScript string
+          const escapedForAppleScript = shellCommand.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
           command = `osascript -e 'tell application "Terminal"
-            do script "cd \\"${escapedPath}\\" && ${escapedCommand}"
+            do script "${escapedForAppleScript}"
             activate
           end tell'`;
           break;
