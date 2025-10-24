@@ -43,7 +43,7 @@ export default function ListProjects() {
               ...(project.workspaceFile ? [{ icon: Icon.Document, tooltip: "Has workspace" }] : []),
               { tag: { value: project.editor, color: "#32D74B" } },
               { tag: { value: project.terminal, color: "#007AFF" } },
-              { text: `ID: ${project.id}` }
+              { text: `ID: ${project.id}` },
             ]}
             icon={Icon.Folder}
             actions={

@@ -48,13 +48,7 @@ export default function AddProject() {
         </ActionPanel>
       }
     >
-      <Form.TextField
-        id="name"
-        title="Project Name"
-        placeholder="My Awesome Project"
-        value={name}
-        onChange={setName}
-      />
+      <Form.TextField id="name" title="Project Name" placeholder="My Awesome Project" value={name} onChange={setName} />
       <Form.FilePicker
         id="path"
         title="Project Path"
@@ -81,7 +75,12 @@ export default function AddProject() {
         <Form.Dropdown.Item value="webstorm" title="WebStorm" />
         <Form.Dropdown.Item value="sublime" title="Sublime Text" />
       </Form.Dropdown>
-      <Form.Dropdown id="terminal" title="Terminal" value={terminal} onChange={(v) => setTerminal(v as any)}>
+      <Form.Dropdown
+        id="terminal"
+        title="Terminal"
+        value={terminal}
+        onChange={(v) => setTerminal(v as "ghostty" | "iterm" | "terminal")}
+      >
         <Form.Dropdown.Item value="ghostty" title="Ghostty" />
         <Form.Dropdown.Item value="iterm" title="iTerm" />
         <Form.Dropdown.Item value="terminal" title="Terminal" />

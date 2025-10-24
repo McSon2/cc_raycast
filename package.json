@@ -4,7 +4,7 @@
   "title": "Project Manager",
   "description": "Manage and open your projects with multiple code editors and Claude Code",
   "icon": "icon.png",
-  "author": "maximesaltet",
+  "author": "mcson2",
   "license": "MIT",
   "commands": [
     {
