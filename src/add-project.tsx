@@ -8,12 +8,13 @@ export default function AddProject() {
   const [workspaceFiles, setWorkspaceFiles] = useState<string[]>([]);
   const [terminal, setTerminal] = useState<"ghostty" | "iterm" | "terminal">("ghostty");
   const [editor, setEditor] = useState<EditorType>("cursor");
+  const [claudeCodeCommand, setClaudeCodeCommand] = useState("cc");
 
   async function handleSubmit() {
     const path = paths[0];
     const workspaceFile = workspaceFiles[0];
 
-    if (!name || !path) {
+    if (!name || !path || !claudeCodeCommand) {
       await showToast({
         style: Toast.Style.Failure,
         title: "Missing fields",
@@ -23,7 +24,7 @@ export default function AddProject() {
     }
 
     try {
-      await addProject({ name, path, terminal, editor, workspaceFile });
+      await addProject({ name, path, terminal, editor, workspaceFile, claudeCodeCommand });
       await showToast({
         style: Toast.Style.Success,
         title: "Project added",
@@ -85,6 +86,14 @@ export default function AddProject() {
         <Form.Dropdown.Item value="iterm" title="iTerm" />
         <Form.Dropdown.Item value="terminal" title="Terminal" />
       </Form.Dropdown>
+      <Form.TextField
+        id="claudeCodeCommand"
+        title="Claude Code Command"
+        placeholder="cc"
+        value={claudeCodeCommand}
+        onChange={setClaudeCodeCommand}
+        info="The command to launch Claude Code in terminal (e.g., 'cc', 'claude code', 'claude-code')"
+      />
     </Form>
   );
 }

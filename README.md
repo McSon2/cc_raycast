@@ -42,6 +42,7 @@ L'extension apparaîtra automatiquement dans Raycast !
   - Fichier workspace (optionnel) : Sélectionne un fichier `.workspace` pour l'ouvrir directement
   - Éditeur de code (Cursor, VS Code, Zed, WebStorm, Sublime Text)
   - Terminal préféré (Ghostty, iTerm, ou Terminal)
+  - Commande Claude Code : La commande pour lancer Claude Code (par défaut: `cc`)
 
 ### 2️⃣ Ouvrir un projet
 - Lance **"Open Project"** dans Raycast
@@ -102,6 +103,7 @@ interface Project {
   editor: EditorType;
   terminal: "ghostty" | "iterm" | "terminal";
   workspaceFile?: string; // Chemin optionnel vers un fichier .workspace
+  claudeCodeCommand: string; // Commande pour lancer Claude Code
 }
 ```
 
@@ -128,7 +130,17 @@ Chaque éditeur peut être configuré par projet, permettant d'utiliser différe
 - **iTerm** : Terminal avancé pour macOS
 - **Terminal** : Terminal natif macOS
 
-Chaque terminal lance automatiquement Claude Code (`cc`) dans le dossier du projet.
+Chaque terminal lance automatiquement Claude Code dans le dossier du projet.
+
+## ⚙️ Commande Claude Code Personnalisable
+
+L'extension permet de configurer **par projet** la commande pour lancer Claude Code. Exemples de commandes possibles :
+- `cc` (par défaut) : Si Claude Code est installé avec le CLI standard
+- `claude code` : Si tu as installé avec ce nom de commande
+- `claude-code` : Variante avec tiret
+- `/chemin/absolu/vers/claude-code` : Chemin complet si la commande n'est pas dans le PATH
+
+Cette flexibilité permet d'avoir différentes versions de Claude Code ou différentes installations selon les projets.
 
 ## 🔧 Dépendances
 
@@ -162,6 +174,7 @@ npm run fix-lint
 - [x] Ajouter la possibilité d'éditer un projet existant
 - [x] Support pour plusieurs éditeurs (Cursor, VS Code, Zed, WebStorm, Sublime Text)
 - [x] Support pour les fichiers `.workspace`
+- [x] Commande Claude Code personnalisable par projet
 - [ ] Ajouter des raccourcis clavier personnalisés globaux
 - [ ] Ajouter des tags/catégories pour organiser les projets
 - [ ] Recherche avancée avec filtres

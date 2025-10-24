@@ -9,6 +9,7 @@ export interface Project {
   terminal: "ghostty" | "iterm" | "terminal";
   editor: EditorType;
   workspaceFile?: string; // Chemin optionnel vers un fichier .workspace
+  claudeCodeCommand: string; // Commande pour lancer Claude Code (ex: "cc", "claude code")
 }
 
 const STORAGE_KEY = "projects";

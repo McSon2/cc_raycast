@@ -64,23 +64,24 @@ export default function OpenProject() {
   async function openInTerminal(project: Project) {
     try {
       let command = "";
+      const ccCommand = project.claudeCodeCommand || "cc";
 
       switch (project.terminal) {
         case "ghostty":
           // Ghostty: ouvre l'app, active-la puis envoie les commandes
-          command = `open -na Ghostty && sleep 0.5 && osascript -e 'tell application "Ghostty" to activate' -e 'delay 0.3' -e 'tell application "System Events" to keystroke "cd ${project.path.replace(/"/g, '\\"')} && cc"' -e 'tell application "System Events" to keystroke return'`;
+          command = `open -na Ghostty && sleep 0.5 && osascript -e 'tell application "Ghostty" to activate' -e 'delay 0.3' -e 'tell application "System Events" to keystroke "cd ${project.path.replace(/"/g, '\\"')} && ${ccCommand}"' -e 'tell application "System Events" to keystroke return'`;
           break;
         case "iterm":
           command = `osascript -e 'tell application "iTerm"
             create window with default profile
             tell current session of current window
-              write text "cd '${project.path}' && cc"
+              write text "cd '${project.path}' && ${ccCommand}"
             end tell
           end tell'`;
           break;
         case "terminal":
           command = `osascript -e 'tell application "Terminal"
-            do script "cd '${project.path}' && cc"
+            do script "cd '${project.path}' && ${ccCommand}"
             activate
           end tell'`;
           break;
@@ -128,7 +129,7 @@ export default function OpenProject() {
             actions={
               <ActionPanel>
                 <ActionPanel.Section title="Open Project">
-                  <Action title="Open Both" onAction={() => openBoth(project)} icon={Icon.RocketLaunch} />
+                  <Action title="Open Both" onAction={() => openBoth(project)} icon={Icon.Bolt} />
                   <Action
                     title={`Open in ${getEditorName(project.editor)} Only`}
                     onAction={() => openInEditor(project)}

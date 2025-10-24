@@ -10,6 +10,7 @@ export default function EditProject() {
   const [workspaceFiles, setWorkspaceFiles] = useState<string[]>([]);
   const [terminal, setTerminal] = useState<"ghostty" | "iterm" | "terminal">("ghostty");
   const [editor, setEditor] = useState<EditorType>("cursor");
+  const [claudeCodeCommand, setClaudeCodeCommand] = useState("cc");
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -25,6 +26,7 @@ export default function EditProject() {
         setWorkspaceFiles(project.workspaceFile ? [project.workspaceFile] : []);
         setTerminal(project.terminal);
         setEditor(project.editor);
+        setClaudeCodeCommand(project.claudeCodeCommand || "cc");
       }
     }
   }, [selectedProjectId, projects]);
@@ -51,7 +53,7 @@ export default function EditProject() {
     const path = paths[0];
     const workspaceFile = workspaceFiles[0];
 
-    if (!name || !path || !selectedProjectId) {
+    if (!name || !path || !selectedProjectId || !claudeCodeCommand) {
       await showToast({
         style: Toast.Style.Failure,
         title: "Missing fields",
@@ -61,7 +63,7 @@ export default function EditProject() {
     }
 
     try {
-      await updateProject(selectedProjectId, { name, path, terminal, editor, workspaceFile });
+      await updateProject(selectedProjectId, { name, path, terminal, editor, workspaceFile, claudeCodeCommand });
       await showToast({
         style: Toast.Style.Success,
         title: "Project updated",
@@ -143,6 +145,14 @@ export default function EditProject() {
         <Form.Dropdown.Item value="iterm" title="iTerm" />
         <Form.Dropdown.Item value="terminal" title="Terminal" />
       </Form.Dropdown>
+      <Form.TextField
+        id="claudeCodeCommand"
+        title="Claude Code Command"
+        placeholder="cc"
+        value={claudeCodeCommand}
+        onChange={setClaudeCodeCommand}
+        info="The command to launch Claude Code in terminal (e.g., 'cc', 'claude code', 'claude-code')"
+      />
     </Form>
   );
 }
