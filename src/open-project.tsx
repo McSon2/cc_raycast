@@ -31,11 +31,13 @@ export default function OpenProject() {
 
   async function openInCursor(project: Project) {
     try {
-      await open(project.path, "Cursor");
+      // Si un fichier workspace existe, l'ouvrir, sinon ouvrir le dossier
+      const targetPath = project.workspaceFile || project.path;
+      await open(targetPath, "Cursor");
       await showToast({
         style: Toast.Style.Success,
         title: "Opened in Cursor",
-        message: project.name,
+        message: project.workspaceFile ? `${project.name} (workspace)` : project.name,
       });
     } catch (error) {
       await showToast({
@@ -105,7 +107,10 @@ export default function OpenProject() {
             key={project.id}
             title={project.name}
             subtitle={project.path}
-            accessories={[{ text: project.terminal }]}
+            accessories={[
+              ...(project.workspaceFile ? [{ icon: Icon.Document, tooltip: "Has workspace file" }] : []),
+              { text: project.terminal },
+            ]}
             actions={
               <ActionPanel>
                 <Action title="Open Both" onAction={() => openBoth(project)} icon={Icon.RocketLaunch} />

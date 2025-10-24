@@ -5,6 +5,7 @@ export interface Project {
   name: string;
   path: string;
   terminal: "ghostty" | "iterm" | "terminal";
+  workspaceFile?: string; // Chemin optionnel vers un fichier .workspace
 }
 
 const STORAGE_KEY = "projects";

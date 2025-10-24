@@ -38,6 +38,7 @@ L'extension apparaîtra automatiquement dans Raycast !
 - Remplis :
   - Nom du projet
   - Chemin du dossier (sélecteur de fichiers)
+  - Fichier workspace (optionnel) : Sélectionne un fichier `.workspace` pour l'ouvrir directement dans Cursor
   - Terminal préféré (Ghostty, iTerm, ou Terminal)
 
 ### 2️⃣ Ouvrir un projet
@@ -83,8 +84,16 @@ interface Project {
   name: string;
   path: string;
   terminal: "ghostty" | "iterm" | "terminal";
+  workspaceFile?: string; // Chemin optionnel vers un fichier .workspace
 }
 ```
+
+### 📄 Fichiers Workspace
+
+Tu peux associer un fichier `.workspace` à ton projet. Quand tu ouvres le projet dans Cursor, c'est le workspace qui sera ouvert au lieu du simple dossier. Cela permet de :
+- Conserver tes onglets ouverts
+- Garder ta configuration d'éditeur spécifique au projet
+- Ouvrir plusieurs dossiers en même temps (multi-root workspace)
 
 ## 💡 Terminaux supportés
 
@@ -125,7 +134,10 @@ npm run fix-lint
 - [ ] Ajouter une vraie icône PNG (512x512px minimum)
 - [ ] Ajouter la possibilité d'éditer un projet existant
 - [ ] Ajouter des raccourcis clavier personnalisés
-- [ ] Ajouter support pour d'autres éditeurs (VSCode, etc.)
+- [ ] Ajouter support pour d'autres éditeurs (VSCode, Zed, etc.)
+- [x] Support pour les fichiers `.workspace` de Cursor
+- [ ] Ajouter des tags/catégories pour organiser les projets
+- [ ] Recherche avancée avec filtres
 
 ## 📄 Licence
 

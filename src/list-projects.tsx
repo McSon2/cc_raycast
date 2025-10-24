@@ -40,6 +40,7 @@ export default function ListProjects() {
             title={project.name}
             subtitle={project.path}
             accessories={[
+              ...(project.workspaceFile ? [{ icon: Icon.Document, tooltip: "Has workspace" }] : []),
               { tag: { value: project.terminal, color: "#007AFF" } },
               { text: `ID: ${project.id}` }
             ]}

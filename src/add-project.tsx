@@ -5,10 +5,13 @@ import { addProject } from "./utils/storage";
 export default function AddProject() {
   const [name, setName] = useState("");
   const [paths, setPaths] = useState<string[]>([]);
+  const [workspaceFiles, setWorkspaceFiles] = useState<string[]>([]);
   const [terminal, setTerminal] = useState<"ghostty" | "iterm" | "terminal">("ghostty");
 
   async function handleSubmit() {
     const path = paths[0];
+    const workspaceFile = workspaceFiles[0];
+
     if (!name || !path) {
       await showToast({
         style: Toast.Style.Failure,
@@ -19,7 +22,7 @@ export default function AddProject() {
     }
 
     try {
-      await addProject({ name, path, terminal });
+      await addProject({ name, path, terminal, workspaceFile });
       await showToast({
         style: Toast.Style.Success,
         title: "Project added",
@@ -59,6 +62,16 @@ export default function AddProject() {
         value={paths}
         onChange={setPaths}
       />
+      <Form.FilePicker
+        id="workspaceFile"
+        title="Workspace File (Optional)"
+        allowMultipleSelection={false}
+        canChooseDirectories={false}
+        canChooseFiles
+        value={workspaceFiles}
+        onChange={setWorkspaceFiles}
+      />
+      <Form.Description text="Select a .workspace file to open it directly in Cursor instead of the folder" />
       <Form.Dropdown id="terminal" title="Terminal" value={terminal} onChange={(v) => setTerminal(v as any)}>
         <Form.Dropdown.Item value="ghostty" title="Ghostty" />
         <Form.Dropdown.Item value="iterm" title="iTerm" />

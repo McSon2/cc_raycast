@@ -70,7 +70,10 @@ export default function DeleteProject() {
             key={project.id}
             title={project.name}
             subtitle={project.path}
-            accessories={[{ text: project.terminal }]}
+            accessories={[
+              ...(project.workspaceFile ? [{ icon: Icon.Document, tooltip: "Has workspace" }] : []),
+              { text: project.terminal },
+            ]}
             icon={Icon.Trash}
             actions={
               <ActionPanel>
