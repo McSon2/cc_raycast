@@ -7,32 +7,16 @@ import { promisify } from "util";
 const execAsync = promisify(exec);
 
 /**
- * Escapes a string for safe use in shell commands
- * Wraps the string in single quotes and escapes any single quotes within
- */
-function escapeShellArg(arg: string): string {
-  return `'${arg.replace(/'/g, "'\\''")}'`;
-}
-
-/**
- * Escapes a string for use in AppleScript strings
- * Escapes backslashes and double quotes
- */
-function escapeAppleScriptString(str: string): string {
-  return str.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
-}
-
-/**
  * Escapes a path for safe use when typed into a shell via keystroke
  * The path will be wrapped in double quotes and special chars escaped
  */
 function escapePathForShell(path: string): string {
   // Escape special shell characters that could break out of quotes or execute commands
   return path
-    .replace(/\\/g, "\\\\")  // Backslash
-    .replace(/"/g, '\\"')    // Double quote
-    .replace(/\$/g, "\\$")   // Dollar sign
-    .replace(/`/g, "\\`");   // Backtick
+    .replace(/\\/g, "\\\\") // Backslash
+    .replace(/"/g, '\\"') // Double quote
+    .replace(/\$/g, "\\$") // Dollar sign
+    .replace(/`/g, "\\`"); // Backtick
 }
 
 export default function OpenProject() {
