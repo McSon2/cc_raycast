@@ -52,7 +52,8 @@ export default function OpenProject() {
 
       switch (project.terminal) {
         case "ghostty":
-          command = `open -a "Ghostty" --args -e bash -c "cd '${project.path}' && cc"`;
+          // Ghostty: ouvre l'app, active-la puis envoie les commandes
+          command = `open -na Ghostty && sleep 0.5 && osascript -e 'tell application "Ghostty" to activate' -e 'delay 0.3' -e 'tell application "System Events" to keystroke "cd ${project.path.replace(/"/g, '\\"')} && cc"' -e 'tell application "System Events" to keystroke return'`;
           break;
         case "iterm":
           command = `osascript -e 'tell application "iTerm"
