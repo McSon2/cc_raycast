@@ -1,19 +1,57 @@
-import { Action, ActionPanel, Form, showToast, Toast, popToRoot } from "@raycast/api";
-import { useState } from "react";
-import { addProject, EditorType } from "./utils/storage";
+import { Action, ActionPanel, Form, showToast, Toast, popToRoot, Icon } from "@raycast/api";
+import { useEffect, useState } from "react";
+import { getProjects, updateProject, Project, EditorType } from "./utils/storage";
 
-export default function AddProject() {
+export default function EditProject() {
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [selectedProjectId, setSelectedProjectId] = useState<string>("");
   const [name, setName] = useState("");
   const [paths, setPaths] = useState<string[]>([]);
   const [workspaceFiles, setWorkspaceFiles] = useState<string[]>([]);
   const [terminal, setTerminal] = useState<"ghostty" | "iterm" | "terminal">("ghostty");
   const [editor, setEditor] = useState<EditorType>("cursor");
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    loadProjects();
+  }, []);
+
+  useEffect(() => {
+    if (selectedProjectId) {
+      const project = projects.find((p) => p.id === selectedProjectId);
+      if (project) {
+        setName(project.name);
+        setPaths([project.path]);
+        setWorkspaceFiles(project.workspaceFile ? [project.workspaceFile] : []);
+        setTerminal(project.terminal);
+        setEditor(project.editor);
+      }
+    }
+  }, [selectedProjectId, projects]);
+
+  async function loadProjects() {
+    try {
+      const data = await getProjects();
+      setProjects(data);
+      if (data.length > 0) {
+        setSelectedProjectId(data[0].id);
+      }
+    } catch (error) {
+      await showToast({
+        style: Toast.Style.Failure,
+        title: "Failed to load projects",
+        message: error instanceof Error ? error.message : "Unknown error",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
   async function handleSubmit() {
     const path = paths[0];
     const workspaceFile = workspaceFiles[0];
 
-    if (!name || !path) {
+    if (!name || !path || !selectedProjectId) {
       await showToast({
         style: Toast.Style.Failure,
         title: "Missing fields",
@@ -23,30 +61,50 @@ export default function AddProject() {
     }
 
     try {
-      await addProject({ name, path, terminal, editor, workspaceFile });
+      await updateProject(selectedProjectId, { name, path, terminal, editor, workspaceFile });
       await showToast({
         style: Toast.Style.Success,
-        title: "Project added",
-        message: `${name} has been added successfully`,
+        title: "Project updated",
+        message: `${name} has been updated successfully`,
       });
       await popToRoot();
     } catch (error) {
       await showToast({
         style: Toast.Style.Failure,
-        title: "Failed to add project",
+        title: "Failed to update project",
         message: error instanceof Error ? error.message : "Unknown error",
       });
     }
   }
 
+  if (projects.length === 0 && !isLoading) {
+    return (
+      <Form>
+        <Form.Description text="No projects to edit. Add a project first using 'Add Project'." />
+      </Form>
+    );
+  }
+
   return (
     <Form
+      isLoading={isLoading}
       actions={
         <ActionPanel>
-          <Action.SubmitForm title="Add Project" onSubmit={handleSubmit} />
+          <Action.SubmitForm title="Update Project" onSubmit={handleSubmit} icon={Icon.Checkmark} />
         </ActionPanel>
       }
     >
+      <Form.Dropdown
+        id="projectSelect"
+        title="Select Project"
+        value={selectedProjectId}
+        onChange={setSelectedProjectId}
+      >
+        {projects.map((project) => (
+          <Form.Dropdown.Item key={project.id} value={project.id} title={project.name} />
+        ))}
+      </Form.Dropdown>
+      <Form.Separator />
       <Form.TextField
         id="name"
         title="Project Name"

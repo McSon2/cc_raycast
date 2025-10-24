@@ -1,10 +1,13 @@
 import { LocalStorage } from "@raycast/api";
 
+export type EditorType = "cursor" | "vscode" | "zed" | "webstorm" | "sublime";
+
 export interface Project {
   id: string;
   name: string;
   path: string;
   terminal: "ghostty" | "iterm" | "terminal";
+  editor: EditorType;
   workspaceFile?: string; // Chemin optionnel vers un fichier .workspace
 }
 
@@ -29,6 +32,16 @@ export async function addProject(project: Omit<Project, "id">): Promise<void> {
     id: Date.now().toString(),
   };
   projects.push(newProject);
+  await saveProjects(projects);
+}
+
+export async function updateProject(id: string, updates: Partial<Omit<Project, "id">>): Promise<void> {
+  const projects = await getProjects();
+  const index = projects.findIndex((p) => p.id === id);
+  if (index === -1) {
+    throw new Error("Project not found");
+  }
+  projects[index] = { ...projects[index], ...updates };
   await saveProjects(projects);
 }
 

@@ -72,6 +72,7 @@ export default function DeleteProject() {
             subtitle={project.path}
             accessories={[
               ...(project.workspaceFile ? [{ icon: Icon.Document, tooltip: "Has workspace" }] : []),
+              { tag: { value: project.editor, color: "#32D74B" } },
               { text: project.terminal },
             ]}
             icon={Icon.Trash}

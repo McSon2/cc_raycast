@@ -1,4 +1,4 @@
-import { Action, ActionPanel, List, showToast, Toast, open, Icon } from "@raycast/api";
+import { Action, ActionPanel, List, showToast, Toast, open, Icon, launchCommand, LaunchType } from "@raycast/api";
 import { useEffect, useState } from "react";
 import { getProjects, Project } from "./utils/storage";
 import { exec } from "child_process";
@@ -29,20 +29,33 @@ export default function OpenProject() {
     }
   }
 
-  async function openInCursor(project: Project) {
+  function getEditorName(editor: string): string {
+    const editorNames: Record<string, string> = {
+      cursor: "Cursor",
+      vscode: "Visual Studio Code",
+      zed: "Zed",
+      webstorm: "WebStorm",
+      sublime: "Sublime Text",
+    };
+    return editorNames[editor] || editor;
+  }
+
+  async function openInEditor(project: Project) {
     try {
       // Si un fichier workspace existe, l'ouvrir, sinon ouvrir le dossier
       const targetPath = project.workspaceFile || project.path;
-      await open(targetPath, "Cursor");
+      const editorApp = getEditorName(project.editor);
+
+      await open(targetPath, editorApp);
       await showToast({
         style: Toast.Style.Success,
-        title: "Opened in Cursor",
+        title: `Opened in ${editorApp}`,
         message: project.workspaceFile ? `${project.name} (workspace)` : project.name,
       });
     } catch (error) {
       await showToast({
         style: Toast.Style.Failure,
-        title: "Failed to open Cursor",
+        title: `Failed to open ${getEditorName(project.editor)}`,
         message: error instanceof Error ? error.message : "Unknown error",
       });
     }
@@ -89,7 +102,7 @@ export default function OpenProject() {
   }
 
   async function openBoth(project: Project) {
-    await openInCursor(project);
+    await openInEditor(project);
     await openInTerminal(project);
   }
 
@@ -109,17 +122,34 @@ export default function OpenProject() {
             subtitle={project.path}
             accessories={[
               ...(project.workspaceFile ? [{ icon: Icon.Document, tooltip: "Has workspace file" }] : []),
+              { tag: { value: project.editor, color: "#32D74B" } },
               { text: project.terminal },
             ]}
             actions={
               <ActionPanel>
-                <Action title="Open Both" onAction={() => openBoth(project)} icon={Icon.RocketLaunch} />
-                <Action title="Open in Cursor Only" onAction={() => openInCursor(project)} icon={Icon.Code} />
-                <Action
-                  title="Open in Terminal + Claude Code"
-                  onAction={() => openInTerminal(project)}
-                  icon={Icon.Terminal}
-                />
+                <ActionPanel.Section title="Open Project">
+                  <Action title="Open Both" onAction={() => openBoth(project)} icon={Icon.RocketLaunch} />
+                  <Action
+                    title={`Open in ${getEditorName(project.editor)} Only`}
+                    onAction={() => openInEditor(project)}
+                    icon={Icon.Code}
+                  />
+                  <Action
+                    title="Open in Terminal + Claude Code"
+                    onAction={() => openInTerminal(project)}
+                    icon={Icon.Terminal}
+                  />
+                </ActionPanel.Section>
+                <ActionPanel.Section title="Manage">
+                  <Action
+                    title="Edit Project"
+                    icon={Icon.Pencil}
+                    shortcut={{ modifiers: ["cmd"], key: "e" }}
+                    onAction={async () => {
+                      await launchCommand({ name: "edit-project", type: LaunchType.UserInitiated });
+                    }}
+                  />
+                </ActionPanel.Section>
               </ActionPanel>
             }
           />

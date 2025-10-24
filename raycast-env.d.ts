@@ -19,6 +19,8 @@ declare namespace Preferences {
   export type OpenProject = ExtensionPreferences & {}
   /** Preferences accessible in the `list-projects` command */
   export type ListProjects = ExtensionPreferences & {}
+  /** Preferences accessible in the `edit-project` command */
+  export type EditProject = ExtensionPreferences & {}
   /** Preferences accessible in the `delete-project` command */
   export type DeleteProject = ExtensionPreferences & {}
 }
@@ -30,6 +32,8 @@ declare namespace Arguments {
   export type OpenProject = {}
   /** Arguments passed to the `list-projects` command */
   export type ListProjects = {}
+  /** Arguments passed to the `edit-project` command */
+  export type EditProject = {}
   /** Arguments passed to the `delete-project` command */
   export type DeleteProject = {}
 }
